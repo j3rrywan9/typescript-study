@@ -31,6 +31,24 @@ This reveals the true value of acceptance tests as a communication and collabora
 The easy readability of Cucumber acceptance tests draws business stakeholders into the process, helping you explore and
 understand their requirements.
 
+### How Cucumber Works
+
+When you run Cucumber, it reads in your specifications from plain language text files called *features*, examines them
+for *scenarios* to test, and runs the scenarios against your system.
+Each scenario is a list of *steps* for Cucumber to work through.
+So that Cucumber can understand these feature files, they must follow some basic syntax rules.
+The name for this set of rules is *Gherkin*.
+
+Along with the features, you give Cucumber a set of *step definitions*, which map the business readable language of each
+step into code to carry out whatever action is being described by the step.
+In a mature test suite, the step definition itself will probably just be one or two lines of code that delegate to a
+library of *support code*, specific to the domain of your application, that knows how to carry out common tasks on the
+system.
+Sometimes that may involve using an *automation library*, like the browser automation library Selenium, to interact with
+the system itself.
+
+### Creating Step Definitions
+
 ## Cucumber.js
 
 Cucumber is a tool for running automated tests written in plain language.
