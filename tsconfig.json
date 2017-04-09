@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "es5"
+  },
+  "exclude": [
+    "dist",
+    "node_modules",
+    "src/bower_components",
+    "test/e2e"
+  ],
+  "compileOnSave": true,
+  "buildOnSave": false,
+  "atom": {
+      "rewriteTsconfig": false
+  }
+}
