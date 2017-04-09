@@ -1,0 +1,19 @@
+{
+  "name": "e2e",
+  "version": "1.0.0",
+  "description": "E2E tests.",
+  "main": "index.js",
+  "scripts": {
+    "test": "protractor protractor.conf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/j3rrywan9/typescript-study.git"
+  },
+  "author": "Jerry Wang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/j3rrywan9/typescript-study/issues"
+  },
+  "homepage": "https://github.com/j3rrywan9/typescript-study#readme"
+}
