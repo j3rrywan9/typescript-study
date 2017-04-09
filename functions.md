@@ -1,5 +1,10 @@
 # Working with Functions
 
+## JavaScript
+
+The `function` keyword is used to define functions.
+The function name is followed by a comma-separated list of parameter names in parentheses.
+
 ## Working with functions in TypeScript
 
 The interpreter can evaluate a function declaration as it is being parsed.
@@ -25,3 +30,4 @@ To indicate that a function parameter is optional, we just need to provide a def
 declaring the function's signature.
 
 ### Functions with rest parameters
+
