@@ -1,0 +1,7 @@
+#!/bin/bash
+
+npm cache clean
+rm -rf ./src/node_modules
+rm -rf ./src/*.js
+rm -rf ./src/*.js.map
+
