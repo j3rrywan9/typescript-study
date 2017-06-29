@@ -35,6 +35,14 @@ Variables declared with `let` are scoped to the nearest enclosing block (or glob
 The `const` keyword creates a constant that can be global or local to the block in which it is declared.
 This means that constants are block scoped.
 
+The TypeScript language also allows us to define a variable as a constant, by using the `const` keyword.
+If a variable has been marked as `const`, then its value can only be set when the variable is defined, and cannot be changed afterwards.
+
+TypeScript introduces the `let` keyword, which can be used in the place of the `var` keyword when defining variables.
+One of the advantage of using the `let` keyword is that we cannot use a variable name before it has been defined.
+Another side effect of using the `let` keyword, is that variable defined with `let` are block-scoped.
+This means that their value and definition are limited to the block of code that they reside in.
+
 ### Union types
 
 Union types are used to declare a variable that is able to store a value of two or more types.
@@ -62,13 +70,3 @@ TypeScript includes, by default, a file named `lib.d.ts` that provides interface
 
 Declaration files use file extension `.d.ts` and are used to increase the TypeScript compatibility with third-party libraries and runtime environments such as Node.js or a Web browser.
 
-### Functions
-
-TypeScript function can be created either as a named function or as an anonymous function.
-
-### Classes
-
-When we declare a class in TypeScript, all the methods and properties are public by default.
-
-When we refer to one of the members of the class (from within itself) we prepend the `this` operator.
-The `this` operator denotes that it's a member access.
