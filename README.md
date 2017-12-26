@@ -9,14 +9,14 @@ node --version
 
 Upgrade npm
 ```bash
-sudo npm install -g npm@4.4.1
+sudo npm install -g npm@5.2.0
 
 npm --version
 ```
 
 Install TypeScript
 ```bash
-sudo npm install -g typescript@2.2
+sudo npm install -g typescript@2.6.1
 
 tsc --version
 ```
