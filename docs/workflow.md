@@ -36,10 +36,11 @@ The package manager will then search for the `package.json` file and install all
 ### Bower
 
 Bower is another package management tool.
+It is really similar to npm but it was designed specifically to manage frontend dependencies.
 
 ### Typings
 
-The type definition files usually contian the type declarations of third-party libraries.
+The type definition files usually contain the type declarations of third-party libraries.
 These files facilitate the integration between the existing JavaScript libraries and TypeScript.
 
 If we want to invoke the jQuery in a TypeScript file, we need to add a reference to the jQuery type definition file in our TypeScript code, as shown in
