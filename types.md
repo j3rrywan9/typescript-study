@@ -20,9 +20,40 @@ This process in which types are automatically detected is known as **type infere
 | Array | |
 | Enum | An enum is a way of giving more friendly names to sets of numeric values. |
 | Any | The any type is used to represent any JavaScript value. |
-| Void | The opposite in some ways to any is `void`, the absence of having any type at all. |
+| Void | The opposite in some ways to `anya is `void`, the absence of having any type at all. |
 
 In TypeScript, we will not be able to use `null` or `undefined` as types.
+
+### Void
+
+`void` is available *only* in TypeScript.
+The `void` type is applicable to functions' return types.
+`void` indicates that a function is not expected to return anything.
+
+### Any
+
+`any` is available *only* in TypeScript.
+The `any` type is the most flexible type.
+It allows you to get closer to the loose nature of JavaScript when there is a need for it.
+Such needs could arise from third-party libraries that are not typed and if you don't know which value type may be returned from a property or method.
+
+This type can store all the known JavaScript types.
+
+### Tuple
+
+Tuples are available *only* in TypeScript.
+
+### Enums
+
+Enums are available *only* in TypeScript.
+
+Enums are 0-based.
+
+### Functions and function types
+
+Functions use types in two different parts of their declaration:
+* Function parameters
+* Function return value
 
 ### Var, let, and const
 
