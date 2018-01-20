@@ -101,3 +101,16 @@ TypeScript includes, by default, a file named `lib.d.ts` that provides interface
 
 Declaration files use file extension `.d.ts` and are used to increase the TypeScript compatibility with third-party libraries and runtime environments such as Node.js or a Web browser.
 
+### Template strings
+
+Before we continue our discussion on types, it is worth noting that TypeScript allows for ES6 template string syntax.
+This syntax provides a convenient method for injecting values into strings.
+```typescript
+var myVariable = "test";
+console.log(`myVariable=${myVariable}`);
+```
+There are two important things to note about this syntax.
+Firstly, we have switched the string definition from a double quote (`"`) to an apostrophe (`````).
+Using an apostrophe signals to the TypeScript compiler that it should look for template values within the string enclosed by the apostrophes, and replace them with actual values.
+Secondly, we have used a special `${ ... }` syntax within the string to denote a template.
+TypeScript will inject the value of any variable that is currently in scope into the string for us.
