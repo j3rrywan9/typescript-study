@@ -35,3 +35,21 @@ To indicate that a function parameter is optional, we just need to provide a def
 
 ### Functions with rest parameters
 
+## Function signatures
+
+The TypeScript "syntactic sugar" that enforces strong typing on normal variables, can also be used with callback functions.
+In order to do this, TypeScript introduces a new syntax, named the fat arrow syntax, `() =>`.
+When the fat arrow syntax is used, it means that one of the parameters to a function needs to be another function.
+```typescript
+function callBackFunction(text: string) {
+    console.log(`inside callBackFunction ${text}`);
+}
+
+function doSomethingWithACallback(
+    initialText: string,
+    callback: (initialText: string) => void
+) {
+    console.log(`inside doSomethingWithACallback ${initialText}`);
+    callback(initialText);
+}
+```
