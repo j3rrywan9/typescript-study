@@ -52,23 +52,75 @@ mySimpleClass.print();
 
 In order to access the properties of a class from within a class itself, we need to use the `this` keyword.
 
-## Public, private, and protected modifiers
+Whenever we are inside a class instance, we must use the `this` keyword in order to access any property or function available on the class definition.
 
-### Public by default
+### Implementing interfaces
 
-In TypeScript, each member is `public` by default.
+This allows us to use interfaces to describe some common behaviors of a group of classes.
 
-You may still mark a member `public` explicitly.
+### Class constructors
 
-TypeScript introduces the `public` and `private` access modifiers to mark class variables and functions and functions as either `public` or `private`.
+Classes can accept parameters during their initial construction.
+This allows us to combine the creation of a class and setting its parameters into a single line of code.
+
+### Class functions
+
+All functions within a class adhere to the syntax and rules that we covered in the previous chapter on functions.
+
+### Interface function definitions
+
+Interfaces, like classes, follow the same rules when dealing with functions.
+
+Interfaces cannot include signatures for a constructor function.
+
+### Class modifiers
+
+TypeScript introduces the `public` and `private` access modifiers to mark class variables and functions as either `public` or `private`.
 Additionally, we can also use the `protected` access modifier.
 
-## Readonly modifier
-
-You can make properties readonly by using the `readonly` keyword.
-Readonly properties must be initialized at their declaration or in the constructor.
+Class functions are `public` by default.
 
 ## Constructor access modifiers
 
-TypeScript also introduces a shorthand version of the constructor function, allowing you to specify parameters with access modifiers directory in the constructor.
+TypeScript also introduces a shorthand version of the constructor function, allowing you to specify parameters with access modifiers directly in the constructor.
 
+### Readonly properties
+
+In addition to the `public`, `private`, and `protected` access modifiers, we can also mark a class property as `readonly`.
+There is only one place where a `readonly` property can be set, and this is within the constructor function itself.
+
+### Class property accessors
+
+ECMAScript 5 introduces the concept of property accessors.
+An accessor is simply a function that is called when a user of our class either sets a property, or retrieves a property.
+To use accessors, we create a pair of `get`a nd `set` functions (with the same function name) in order to access an internal property.
+
+### Static functions
+
+Static functions are functions that can be called on a class without having to create an instance of the class first.
+These functions are almost global in their nature, but must be called by prefixing the function name with the class name.
+
+### Static properties
+
+Similar to static functions, classes can also have static properties.
+
+### Namespaces
+
+When using namespaces, a class definition will not be visible outside of the namespace, unless we specifically allow this using the `export` keyword.
+To create instances of classes that are defined within a namespace, we must reference the class using the full namespace name.
+
+## Inheritance
+
+Both interfaces and classes can use inheritance.
+TypeScript implements inheritance using the `extends` keyword.
+
+### Interface inheritance
+
+### Class inheritance
+
+TypeScript does not support the concept of multiple inheritance.
+A class can, however, implement multiple interfaces.
+
+### The `super` keyword
+
+TypeScript includes the `super` keyword to enable calling a base class's function with the same name.
