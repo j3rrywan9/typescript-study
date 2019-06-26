@@ -2,25 +2,33 @@
 
 ## Installation
 
-Install Node.js v6.10.0 LTS
+### Install nvm
+
 ```bash
-node --version
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 ```
 
-Upgrade npm
-```bash
-sudo npm install -g npm@5.2.0
+### Install Node.js
 
-npm --version
+```bash
+nvm install v10.15.3
+
+nvm alias default v10.15.3
 ```
 
-Install TypeScript
+### Upgrade npm
+
 ```bash
-sudo npm install -g typescript@2.6.1
+nvm use v10.15.3 --silent && npm install --global npm@6.4.1
+```
+
+### Install TypeScript
+
+```bash
+npm install --global typescript@2.9.2
 
 tsc --version
 ```
-
 The `tsc` command is a console interface for the TypeScript compiler.
 This command allows you to compile your TypeScript files into JavaScript files.
 
@@ -59,4 +67,3 @@ Thanks to the efforts of the TypeScript community, almost every popular JavaScri
 Mocha has been one of the most popular test frameworks for JavaScript, while Chai.js is a good choice as an assertion library.
 
 ## Testing in real browsers with Karma
-
