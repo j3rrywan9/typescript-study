@@ -11,7 +11,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 ### Install Node.js
 
 ```bash
-nvm install v10.15.3
+nvm install v12.18.3
 
 nvm alias default v10.15.3
 ```
@@ -19,13 +19,13 @@ nvm alias default v10.15.3
 ### Upgrade npm
 
 ```bash
-nvm use v10.15.3 --silent && npm install --global npm@6.4.1
+nvm use v12.18.3 --silent && npm install --global npm@6.14.7
 ```
 
 ### Install TypeScript
 
 ```bash
-npm install --global typescript@2.9.2
+npm install --global typescript@3.9.7
 
 tsc --version
 ```
