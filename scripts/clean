@@ -1,6 +1,6 @@
 #!/bin/bash
 
-npm cache clean
+npm cache clean --force
 rm -rf ./src/node_modules
 rm -rf ./src/*.js
 rm -rf ./src/*.js.map
