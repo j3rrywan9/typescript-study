@@ -4,19 +4,17 @@
   "description": "Learning TypeScript.",
   "main": "hello.js",
   "devDependencies": {
-    "jasmine-core": "2.3.4",
-    "karma": "1.4.1",
-    "karma-coverage": "1.1.1",
-    "karma-htmlfile-reporter": "0.3.5",
-    "karma-jasmine": "1.1.0",
-    "karma-junit-reporter": "1.2.0",
-    "karma-phantomjs-launcher": "1.0.2",
-    "karma-remap-istanbul": "0.6.0",
+    "jasmine-core": "3.6.0",
+    "karma": "5.1.1",
+    "karma-coverage": "2.0.3",
+    "karma-htmlfile-reporter": "0.3.8",
+    "karma-jasmine": "2.0.1",
+    "karma-junit-reporter": "2.0.1",
     "karma-sourcemap-loader": "0.3.7",
-    "typescript": "2.2"
+    "typescript": "3.9.7"
   },
   "dependencies": {
-    "@types/jasmine": "2.2.34"
+    "@types/jasmine": "3.5.12"
   },
   "scripts": {
     "build:dev": "npm run build:dev:ts",
