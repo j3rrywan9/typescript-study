@@ -1,5 +1,5 @@
 module.exports = function(name) {
-  var module = {};
+  const module = {};
   module.name = name;
 
   module.sayHi = function sayHi() {
