@@ -606,3 +606,339 @@ Parentheses have several purposes in regular expressions.
 One purpose is to group separate items into a single subexpression so that the items can be treated as a single unit by | , * , + , ?, and so on.
 
 Another purpose of parentheses in regular expressions is to define subpatterns within the complete pattern.
+
+## Chapter 13. Asynchronous JavaScript
+
+JavaScript programs in a web browser are typically *event-driven*, meaning that they wait for the user to click or tap before they actually do anything.
+And JavaScript-based servers typically wait for client requests to arrive over the network before they do anything.
+
+### 13.1 Asynchronous Programming with Callbacks
+
+At its most fundamental level, asynchronous programming in JavaScript is done with *callbacks*.
+A callback is a function that you write and then pass to some other function.
+That other function then invokes ("calls back") your function when some condition is met or some (asynchronous) event occurs.
+The invocation of the callback function you provide notifies you of the condition or event, and sometimes, the invocation will include function arguments that provide additional details.
+
+#### 13.1.1 Timers
+
+#### 13.1.2 Events
+
+Client-side JavaScript programs are almost universally event driven: rather than running some kind of predetermined computation, they typically wait for the user to do something and then respond to the user's actions.
+The web browser generates an *event* when the user presses a key on the keyboard, moves the mouse, clicks a mouse button, or touches a touchscreen device.
+Event-driven JavaScript programs register callback functions for specified types of events in specified contexts, and the web browser invokes those functions whenever the specified events occur.
+These callback functions are called *event handlers* or *event listeners*, and they are registered with `addEventListener()`:
+```js
+let okay = document.querySelector('#confirmUpdateDialog button.okay');
+
+okay.addEventListener('click', applyUpdate);
+```
+
+#### 13.1.3 Network Events
+
+Another common source of asynchrony in JavaScript programming is network requests.
+
+Client-side JavaScript code can use the `XMLHttpRequest` class plus callback functions to make HTTP requests and asynchronously handle the server's response when it arrives.
+
+Typically, though, you can also register a single event listener by assigning it directly to a property of the object.
+That is what we do in this example code, assigning functions to the `onload`, `onerror`, and `ontimeout` properties.
+By convention, event listener properties like these always have names that begin with *on*.
+`addEventListener()` is the more flexible technique because it allows for multiple event handlers.
+But in cases where you are sure that no other code will need to register a listener for the same object and event type, it can be simpler to simply set the appropriate property to your callback.
+
+#### 13.1.4 Callbacks and Events in Node
+
+The Node.js server-side JavaScript environment is deeply asynchronous and defines many APIs that use callbacks and events.
+The default API for reading the contents of a file, for example, is asynchronous and invokes a callback function when the contents of the file have been read:
+```js
+const fs = require("fs");
+
+let option = {
+  // default options would go here
+}
+
+// Read a configuration file, then call the callback function
+fs.readFile("config.json", "utf-8", (err, text) => {
+  if (err) {
+    console.warn("Could not read config file:", err);
+  } else {
+    Object.assign(options, JSON.parse(text));
+  }
+
+  // In either case, we can now start running the program
+  startProgram(options);
+});
+```
+Node's `fs.readFile()` function takes a two-parameter callback as its last argument.
+It reads the specified file asynchronously and then invokes the callback.
+If the file was read successfully, it passes the file contents as the second callback argument.
+If there was an error, it passes the error as the first callback argument.
+In this example, we express the callback as an arrow function, which is a succinct and natural syntax for this kind of simple operation.
+
+Node also defines a number of event-based APIs.
+The following function shows how to make an HTTP request for the contents of a URL in Node.
+It has two layers of asynchronous code handled with event listeners.
+Notice that Node uses an `on()` method to register event listeners instead of `addEventListener()`:
+```js
+const https = require("https");
+
+function getText(url, callback) {
+  request = https.get(url);
+
+  request.on("response", response => {
+    let httpStatus = response.statusCode;
+
+    response.setEncoding("utf-8");
+
+    let body = "";
+
+    response.on("data", chunk => { body += chunk; });
+
+    response.on("end", () => {
+      if (httpStatus === 200) {
+        callback(null, body);
+      } else {
+        callback(httpStatus, null);
+      }
+    });
+  });
+
+  request.on("error", (err) => {
+    callback(err, null);
+  });
+}
+```
+
+### 13.2 Promises
+
+Now that we've seen examples of callback and event-based asynchronous programming in client-side and server-side JavaScript environments, we can introduce *Promises*, a core language feature designed to simplify asynchronous programming.
+
+A Promise is an object that represents the result of an asynchronous computation.
+That result may or may not be ready yet, and the Promise API is intentionally vague about this: there is no way to synchronously get the value of a Promise;
+you can only ask the Promise to call a callback function when the value is ready.
+
+Promises allow this kind of nested callback to be re-expressed as a more linear *Promise chain* that tends to be easier to read and easier to reason about. 
+
+#### 13.2.1 Using Promises
+
+You can think of the `then()` method as a callback registration method like the `addEventListener()` method used for registering event handlers in client-side JavaScript.
+If you call the `then()` method of a Promise object multiple times, each of the functions you specify will be called when the promised computation is complete.
+
+Unlike many event listeners, though, a Promise represents a single computation, and each function registered with `then()` will be invoked only once.
+
+At a simple syntactical level, the `then()` method is the distinctive feature of Promises, and it is idiomatic to append `.then()` directly to the function invocation that returns the Promise, without the intermediate step of assigning the Promise object to a variable.
+
+It is also idiomatic to name functions that return Promises and functions that use the results of Promises with verbs, and these idioms lead to code that is particularly easy to read:
+```js
+function displayUserProfile(profile) {}
+
+getJSON("/api/user/profile").then(displayUserProfile);
+```
+
+##### Handling errors with Promises
+
+A Promise represents the future result of an asynchronous computation that occurs after the Promise object is created.
+Because the computation is performed after the Promise object is returned to us, there is no way that the computation can traditionally return a value or throw an exception that we can catch.
+The functions that we pass to `then()` provide alternatives.
+When a synchronous computation completes normally, it simply returns its result to its caller.
+When a Promise-based asynchronous computation completes normally, it passes its result to the function that is the first argument to `then()`.
+
+When something goes wrong in a synchronous computation, it throws an exception that propagates up the call stack until there is a `catch` clause to handle it.
+When an asynchronous computation runs, its caller is no longer on the stack, so if something goes wrong, it is simply not possible to throw an exception back to the caller.
+
+Instead, Promise-based asynchronous computations pass the exception (typically as an Error object of some kind, though this is not required) to the second function passed to `then()`.
+
+In practice, it is rare to see two functions passed to `then()`.
+There is a better and more idiomatic way of handling errors when working with Promises.
+
+The more idiomatic way to handle errors in this code looks like this:
+```js
+getJSON("/api/user/profile").then(displayUserProfile).catch(handleProfileError);
+```
+The `catch()` method is just a shorthand for calling `then()` with a `null` first argument and the specified error handler function as the second argument. 
+
+#### 13.2.2 Chaining Promises
+
+One of the most important benefits of Promises is that they provide a natural way to express a sequence of asynchronous operations as a linear chain of `then()` method invocations, without having to nest each operation within the callback of the previous one.
+
+In its simplest form, this new HTTP API is just the function `fetch()`.
+You pass it a URL, and it returns a Promise.
+That promise is fulfilled when the HTTP response begins to arrive and the HTTP status and headers are available:
+```js
+fetch("/api/user/profile").then(response => {
+  // When the promise resolves, we have status and headers
+  if (response.ok && response.headers.get("Content-Type") === "application/json") {
+  }
+});
+```
+When the Promise returned by `fetch()` is fulfilled, it passes a Response object to the function you passed to its `then()` method.
+This response object gives you access to request status and headers, and it also defines methods like `text()` and `json()`, which
+give you access to the body of the response in text and JSON-parsed forms, respectively.
+But although the initial Promise is fulfilled, the body of the response may not yet have arrived.
+So these `text()` and `json()` methods for accessing the body of the response themselves return Promises.
+
+The preferred idiom is to use Promises in a sequential chain with code like this:
+```js
+fetch("/api/user/profile")
+  .then(response => {
+    return response.json();
+  })
+  .then(profile => {
+    displayUserProfile(profile);
+  });
+```
+Let's look at the method invocations in this code, ignoring the arguments that are passed to the methods:
+```js
+fetch().then().then()
+```
+When more than one method is invoked in a single expression like this, we call it a *method chain*.
+
+Sometimes, when an API is designed to use this kind of method chaining, there is just a single object, and each method of that object returns the object itself in order to facilitate chaining.
+That is not how Promises work, however.
+When we write a chain of `.then()` invocations, we are not registering multiple callbacks on a single Promise object.
+Instead, each invocation of the `then()` method returns a new Promise object.
+That new Promise object is not fulfilled until the function passed to `then()` is complete.
+
+#### 13.2.3 Resolving Promises
+
+When you pass a callback `c` to the `then()` method, `then()` returns a Promise `p` and arranges to asynchronously invoke `c` at some later time.
+The callback performs some computation and returns a value `v`.
+When the callback returns, `p` is resolved with the value `v`.
+When a Promise is resolved with a value that is not itself a Promise, it is immediately fulfilled with that value.
+So if `c` returns a non-Promise, that return value becomes the value of `p`, `p` is fulfilled and we are done.
+But if the return value `v` is itself a Promise, then `p` is *resolved but not yet fulfilled*.
+At this stage, `p` cannot settle until the Promise `v` settles.
+If `v` is fulfilled, then `p` will be fulfilled to the same value.
+If `v` is rejected, then `p` will be rejected for the same reason.
+This is what the "resolved" state of a Promise means: the Promise has become associated with, or "locked onto," another Promise.
+We don't know yet whether `p` will be fulfilled or rejected, but our callback `c` no longer has any control over that.
+`p` is "resolved" in the sense that its fate now depends entirely on what happens to Promise `v`.
+
+#### 13.2.4 More on Promises and Errors
+
+#### 13.2.5 Promises in Parallel
+
+#### 13.2.6 Making Promises
+
+Functions written to return Promises really are quite useful, and this section shows how you can create your own Promise-based APIs.
+
+##### Promises based on other Promises
+
+It is easy to write a function that returns a Promise if you have some other Promise-returning function to start with.
+Given a Promise, you can always create (and return) a new one by calling `.then()`.
+
+##### Promises based on sychronous values
+
+Sometimes, you may need to implement an existing Promise-based API and return a Promise from a function, even though the computation to be performed does not actually require any asynchronous operations.
+In that case, the static methods `Promise.resolve()` and `Promise.reject()` will do what you want.
+`Promise.resolve()` takes a value as its single argument and returns a Promise that will immediately (but asynchronously) be fulfilled to that value.
+
+##### Promises from scratch
+
+But what about writing a Promise-returning function when you can't use another Promise-returning function as the starting point?
+In that case, you use the `Promise()` constructor to create a new Promise object that you have complete control over.
+Here's how it works: you invoke the `Promise()` constructor and pass a function as its only argument.
+The function you pass should be written to expect two parameters, which, by convention, should be named `resolve` and `reject`.
+After calling your function, the `Promise()` constructor returns the newly created Promise.
+That returned Promise is under the control of the function you passed to the constructor.
+That function should perform some asynchronous operation and then call the `resolve` function to resolve or fulfill the returned Promise or call the `reject` function to reject the returned Promise.
+Your function does not have to be asynchronous: it can call `resolve` or `reject` synchronously, but the Promise will still be resolved, fulfilled, or rejected asynchronously if you do this.
+
+#### 13.2.7 Promises in Sequence
+
+### 13.3 `async` and `await`
+
+ES2017 introduces two new keywords - `async` and `await` - that represent a paradigm shift in asynchronous JavaScript programming.
+These new keywords dramatically simplify the use of Promises and allow us to write Promise-based, asynchronous code that looks like synchronous code that blocks while waiting for network responses or other asynchronous events.
+Although it is still important to understand how Promises work, much of their complexity (and sometimes even their very presence!) vanishes when you use them with `async` and `await`.
+
+As we discussed earlier in the chapter, asynchronous code can't return a value or throw an exception the way that regular synchronous code can.
+And this is why Promises are designed the way the are.
+The value of a fulfilled Promise is like the return value of a synchronous function.
+And the value of a rejected Promise is like a value thrown by a synchronous function.
+This latter similarity is made explicit by the naming of the `.catch()` method.
+`async` and `await` take efficient, Promise-based code and hide the Promises so that your asynchronous code can be easy to read and as easy to reason about as inefficient, blocking, synchronous code.
+
+#### 13.3.1 `await` Expressions
+
+The `await` keyword takes a Promise and turns it back into a return value or a thrown exception.
+Given a Promise object `p`, the expression `await p` waits until `p` settles.
+If `p` fulfills, then the value of `await p` is the fulfillment value of `p`.
+On the other hand, if `p` is rejected, then the `await p` expression throws the rejection value of `p`.
+We don't usually use `await` with a variable that holds a Promise; instead, we use it before the invocation of a function that returns a Promise:
+```js
+let response = await fetch("/api/user/profile");
+let profile = await response.json();
+```
+It is critical to understand right away that the `await` keyword does not cause your program to block and literally do nothing until the specified Promise settles.
+The code remains asynchronous, and the `await` simply disguises this fact.
+This means that *any code that uses await is itself asynchronous*.
+
+#### 13.3.2 `async` Functions
+
+Because any code that uses `await` is asynchronous, there is one critical rule: you can only use the `await` keyword within functions that have been declared with the `async` keyword.
+Here's a version of the `getHighScore()` function from earlier in the chapter, rewritten to use `async` and `await`:
+```js
+async function getHighScore() {
+  let response = await fetch("/api/user/profile");
+  let profile = await response.json();
+  return profile.highScore;
+}
+```
+Declaring a function `async` means that the return value of the function will be a Promise even if no Promise-related code appears in the body of the function.
+If an `async` function appears to return normally, then the Promise object that is the real return value of the function will resolve to that apparent return value.
+And if an `async` function appears to throw an exception, then the Promise object that it returns will be rejected with that exception.
+
+But remember, that line of code will only work if it is inside another `async` function!
+You can nest `await` expressions within `async` functions as deeply as you want.
+But if you're at the top level or are inside a function that is not `async` for some reason, then you can't use `await` and have to deal with a returned Promise in the regular way:
+```js
+getHighScore().then(displayHighScore).catch(console.error);
+```
+
+#### 13.3.3 Awaiting Multiple Promises
+
+In order to await a set of concurrently executing async functions, we use `Promise.all()` just as we would if working with Promises directly:
+```js
+let [value1, value2] = await Promise.all([getJSON(url1), getJSON(url2)]);
+```
+
+#### 13.3.4 Implementation Details
+
+Supppose you write an `async` function like this:
+```js
+async function f(x) { /* body */ }
+```
+You can think about this as a Promise-returning function wrapped around the body of your original function:
+```js
+function f(x) {
+  return new Promise(function(resolve, reject) {
+    try {
+      resolve((function(x) { /* body */ })(x));
+    }
+    catch(e) {
+      reject(e);
+    }
+  });
+}
+```
+
+### 13.4 Asynchronous Iteration
+
+## Chapter 14. Metaprogramming
+
+## Chapter 15. JavaScript in Web Browsers
+
+### 15.11 Networking
+
+But in addition to being able to make network requests in response to user actions, web browsers also expose JavaScript APIs for networking as well.
+
+This section covers three networking APIs:
+* The `fetch()` method defines a Promise-based API for making HTTP and HTTPS requests.
+
+#### 15.11.1 `fetch()`
+
+## Chapter 16. Server-Side JavaScript with Node
+
+Node is JavaScript with bindings to the underlying operating system, making it possible to write JavaScript programs that read and write files, execute child processes, and communicate over the network.
+
+The defining feature of Node is its single-threaded event-based concurrency enabled by an asynchronous-by-default API.
