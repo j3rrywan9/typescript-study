@@ -621,6 +621,8 @@ The invocation of the callback function you provide notifies you of the conditio
 
 #### 13.1.1 Timers
 
+One of the simplest kinds of asynchrony is when you want to run some code after a certain amount of time has elapsed.
+
 #### 13.1.2 Events
 
 Client-side JavaScript programs are almost universally event driven: rather than running some kind of predetermined computation, they typically wait for the user to do something and then respond to the user's actions.
@@ -639,6 +641,8 @@ Another common source of asynchrony in JavaScript programming is network request
 
 Client-side JavaScript code can use the `XMLHttpRequest` class plus callback functions to make HTTP requests and asynchronously handle the server's response when it arrives.
 
+Notice that the code example above does not call `addEventListener()` as our previous example did.
+For most web APIs (including this one), event handlers can be defined by invoking `addEventListener()` on the object generating the event and passing the name of the event of interest along with the callback function.
 Typically, though, you can also register a single event listener by assigning it directly to a property of the object.
 That is what we do in this example code, assigning functions to the `onload`, `onerror`, and `ontimeout` properties.
 By convention, event listener properties like these always have names that begin with *on*.
@@ -716,6 +720,10 @@ A Promise is an object that represents the result of an asynchronous computation
 That result may or may not be ready yet, and the Promise API is intentionally vague about this: there is no way to synchronously get the value of a Promise;
 you can only ask the Promise to call a callback function when the value is ready.
 
+So, at the simplest level, Promises are just a different way of working with callbacks.
+However, there are practical benefits to using them.
+One real problem with callback-based asynchronous programming is that it is common to end up with callbacks inside callbacks inside
+callbacks, with lines of code so highly indented that it is difficult to read.
 Promises allow this kind of nested callback to be re-expressed as a more linear *Promise chain* that tends to be easier to read and easier to reason about. 
 
 #### 13.2.1 Using Promises
@@ -736,6 +744,10 @@ getJSON("/api/user/profile").then(displayUserProfile);
 
 ##### Handling errors with Promises
 
+For Promises, we can do this by passing a second function to the `then()` method:
+```js
+getJSON("/api/user/profile").then(displayUserProfile, handleProfileError);
+```
 A Promise represents the future result of an asynchronous computation that occurs after the Promise object is created.
 Because the computation is performed after the Promise object is returned to us, there is no way that the computation can traditionally return a value or throw an exception that we can catch.
 The functions that we pass to `then()` provide alternatives.
@@ -746,6 +758,8 @@ When something goes wrong in a synchronous computation, it throws an exception t
 When an asynchronous computation runs, its caller is no longer on the stack, so if something goes wrong, it is simply not possible to throw an exception back to the caller.
 
 Instead, Promise-based asynchronous computations pass the exception (typically as an Error object of some kind, though this is not required) to the second function passed to `then()`.
+So, in the code above, if `getJSON()` runs normally, it passes its result to `displayUserProfile()`.
+If there is an error (the user is not logged in, the server is down, the user's internet connection dropped, the request timed out, etc.), then `getJSON()` passes an Error object to `handleProfileError()`.
 
 In practice, it is rare to see two functions passed to `then()`.
 There is a better and more idiomatic way of handling errors when working with Promises.
@@ -754,12 +768,36 @@ The more idiomatic way to handle errors in this code looks like this:
 ```js
 getJSON("/api/user/profile").then(displayUserProfile).catch(handleProfileError);
 ```
-The `catch()` method is just a shorthand for calling `then()` with a `null` first argument and the specified error handler function as the second argument. 
+The `catch()` method is just a shorthand for calling `then()` with a `null` first argument and the specified error handler function as the second argument.
+
+When discussing JavaScript Promises, the equivalent terms are "fulfilled" and "rejected."
+Imagine that you have called the `then()` method of a Promise and have passed two callback functions to it.
+We say that the promise has been *fulfilled* if and when the first callback is called.
+And we say that the Promise has been *rejected* if and when the second callback is called.
+If a Promise is neither fulfilled nor rejected, then it is *pending*.
+And once a promise is fulfilled or rejected, we say that it is *settled*.
+Note that a Promise can never be both fulfilled *and* rejected.
+Once a Promise settles, it will never change from fulfilled to rejected or vice versa.
 
 #### 13.2.2 Chaining Promises
 
 One of the most important benefits of Promises is that they provide a natural way to express a sequence of asynchronous operations as a linear chain of `then()` method invocations, without having to nest each operation within the callback of the previous one.
+Here, for example, is a hypothetical Promise chain:
+```js
+fetch(docuementURL)
+  .then(response => response.json())
+  .then(document => {
+    return render(document);
+  })
+  .then(rendered => {
+    cacheInDatabase(rendered);
+  })
+  .catch(error => handle(error));
+```
+This code illustrates how a chain of Promises can make it easy to express a sequence of asynchronous operations.
 
+Earlier in this chapter, we saw the XMLHttpRequest object used to make an HTTP request in JavaScript.
+That strangely named object has an old and awkward API, and it has largely been replaced by the newer, Promise-based Fetch API.
 In its simplest form, this new HTTP API is just the function `fetch()`.
 You pass it a URL, and it returns a Promise.
 That promise is fulfilled when the HTTP response begins to arrive and the HTTP status and headers are available:
@@ -791,6 +829,8 @@ Let's look at the method invocations in this code, ignoring the arguments that a
 fetch().then().then()
 ```
 When more than one method is invoked in a single expression like this, we call it a *method chain*.
+We know that the `fetch()` function returns a Promise object, and we can see that the first `.then()` in this chain invokes a method on that returned Promise object.
+But there is a second `.then()` in the chain, which means that the first invocation of the `then()` method must itself return a Promise.
 
 Sometimes, when an API is designed to use this kind of method chaining, there is just a single object, and each method of that object returns the object itself in order to facilitate chaining.
 That is not how Promises work, however.
@@ -815,7 +855,15 @@ We don't know yet whether `p` will be fulfilled or rejected, but our callback `c
 
 #### 13.2.4 More on Promises and Errors
 
+With asynchronous code, unhandled exceptions will often go unreported, and errors can occur silently, making them much harder to
+debug.
+The good news is that the `.catch()` method makes it easy to handle errors when working with Promises.
+
 #### 13.2.5 Promises in Parallel
+
+`Promise.all()` takes an array of Promise objects as its input and returns a Promise.
+The returned Promise will be rejected if any of the input Promises are rejected.
+Otherwise, it will be fulfilled with an array of the fulfillment values of each of the input Promises.
 
 #### 13.2.6 Making Promises
 
@@ -842,6 +890,22 @@ After calling your function, the `Promise()` constructor returns the newly creat
 That returned Promise is under the control of the function you passed to the constructor.
 That function should perform some asynchronous operation and then call the `resolve` function to resolve or fulfill the returned Promise or call the `reject` function to reject the returned Promise.
 Your function does not have to be asynchronous: it can call `resolve` or `reject` synchronously, but the Promise will still be resolved, fulfilled, or rejected asynchronously if you do this.
+
+It can be hard to understand the functions passed to a function passed to a constructor by just reading about it, but hopefully some examples will make this clear.
+Here's how to write the Promise-based `wait()` function that we used in various examples earlier in the chapter:
+```js
+function wait(duration) {
+  return new Promise((resolve, reject) => {
+    if (duration < 1) {
+      reject(new Error("Time travel not yet implemented"));
+    }
+    setTimeout(resolve, duration);
+  });
+}
+```
+Note that the pair of functions that you use to control the fate of a Promise created with the Promise() constructor are named resolve() and reject(), not fulfill() and reject().
+If you pass a Promise to `resolve()`, the returned Promise will resolve to that new Promise.
+Often, however, you will pass a non-Promise value, which fulfills the returned Promise with that value.
 
 #### 13.2.7 Promises in Sequence
 
@@ -921,6 +985,8 @@ function f(x) {
   });
 }
 ```
+It is harder to express the `await` keyword in terms of a syntax transformation like this one.
+But think of the `await` keyword as a marker that breaks a function body up into separate, synchronous chunks.
 
 ### 13.4 Asynchronous Iteration
 
